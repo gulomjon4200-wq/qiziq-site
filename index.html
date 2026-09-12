@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pul Fabrikasi — pul o'zi pul topadi</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>💰 Pul Fabrikasi</h1>
+    <p class="subtitle">Bosing, biznes soting oling, pulingiz sizsiz ham ishlasin</p>
+  </header>
+
+  <main class="game">
+    <section class="click-area">
+      <div class="balance">
+        <span id="balance">0</span> so'm
+      </div>
+      <div class="income-rate">Soniyasiga: <span id="income-per-sec">0</span> so'm</div>
+
+      <button id="coin-btn" class="coin-btn" aria-label="Pul ishlash">
+        <span class="coin-emoji">🪙</span>
+      </button>
+      <div class="click-value">Har bosishda: +<span id="click-value">1</span> so'm</div>
+
+      <button id="upgrade-click-btn" class="upgrade-click-btn">
+        Bosish kuchini oshirish (<span id="click-upgrade-cost">50</span> so'm)
+      </button>
+    </section>
+
+    <section class="shop">
+      <h2>🏪 Biznes do'koni</h2>
+      <p class="shop-hint">Har bir biznes har soniyada avtomatik pul ishlab topadi.</p>
+      <div id="shop-list" class="shop-list"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <button id="reset-btn" class="reset-btn">O'yinni qayta boshlash</button>
+    <p class="note">Bu — o'quv/o'yin maqsadidagi simulyator. Haqiqiy pul ishtirok etmaydi.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
