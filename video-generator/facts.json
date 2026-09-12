@@ -1,0 +1,102 @@
+[
+  {
+    "id": 1,
+    "category": "kosmos",
+    "text": "Bilasizmi, Venera sayyorasida bir kun, ya'ni o'z o'qi atrofida bir marta aylanish, bir yildan ham uzoqroq davom etadi. Chunki Venera juda sekin aylanadi."
+  },
+  {
+    "id": 2,
+    "category": "hayvonot",
+    "text": "Sakkiztoyoqli sakkizoyoqning uchta yuragi bor. Ikkitasi jabralarga, bittasi esa butun tanaga qon haydaydi. Qiziq tomoni, u suzayotganda markaziy yuragi vaqtincha to'xtaydi."
+  },
+  {
+    "id": 3,
+    "category": "inson_tanasi",
+    "text": "Inson miyasi tanamiz og'irligining atigi ikki foizini tashkil qiladi, lekin butun energiyaning yigirma foizini yolg'iz o'zi sarflaydi."
+  },
+  {
+    "id": 4,
+    "category": "tarix",
+    "text": "Qadimgi Misrda mushuklarni o'ldirish qonun bo'yicha o'lim jazosiga sabab bo'lgan, chunki ular muqaddas hayvon hisoblangan."
+  },
+  {
+    "id": 5,
+    "category": "fan",
+    "text": "Bal asalining tarkibida deyarli suv yo'q, shuning uchun u minglab yillar davomida buzilmasdan saqlanishi mumkin. Qadimgi Misr qabrlaridan hali ham yeyish mumkin bo'lgan asal topilgan."
+  },
+  {
+    "id": 6,
+    "category": "kosmos",
+    "text": "Agar siz Yupiterga tushishga harakat qilsangiz, uning qattiq yuzasi yo'qligi sababli hech qachon 'yerga' tegmaysiz. U asosan gaz va suyuqlikdan iborat."
+  },
+  {
+    "id": 7,
+    "category": "hayvonot",
+    "text": "Kenguru orqaga qarab yura olmaydi. Uning dumi va oyoq tuzilishi faqat oldinga sakrash uchun moslashgan."
+  },
+  {
+    "id": 8,
+    "category": "dunyo",
+    "text": "Rossiya shunchalik kattaki, uning hududi o'n bir xil vaqt mintaqasini o'z ichiga oladi."
+  },
+  {
+    "id": 9,
+    "category": "inson_tanasi",
+    "text": "Inson ko'zi taxminan besh yuz olti million pikselga teng aniqlikda ko'ra oladi, bu esa eng yaxshi kameralardan ham o'tib ketadi."
+  },
+  {
+    "id": 10,
+    "category": "tarix",
+    "text": "Buyuk Xitoy devori bitta odam tomonidan emas, balki ikki ming yildan ortiq vaqt davomida turli sulolalar tomonidan qurilgan."
+  },
+  {
+    "id": 11,
+    "category": "fan",
+    "text": "Olmos aslida ko'mirdan hosil bo'ladi, lekin bu jarayon uchun million yillar va Yer qa'ridagi ulkan bosim kerak bo'ladi."
+  },
+  {
+    "id": 12,
+    "category": "hayvonot",
+    "text": "Ayrim tim meduzalar biologik jihatdan o'lmasdir. Ular jarohatlangach yoki qarigach, yana yosh holatiga qaytib, hayotini qaytadan boshlashi mumkin."
+  },
+  {
+    "id": 13,
+    "category": "kosmos",
+    "text": "Quyosh tizimidagi eng baland tog' Marsda joylashgan. Olimp tog'ining balandligi Everestdan deyarli uch baravar yuqori."
+  },
+  {
+    "id": 14,
+    "category": "dunyo",
+    "text": "Islandiyada politsiya deyarli hech qachon qurol tashimaydi. Bu dunyodagi eng xavfsiz mamlakatlardan biri hisoblanadi."
+  },
+  {
+    "id": 15,
+    "category": "inson_tanasi",
+    "text": "Siz uxlab yotganingizda ham miyangiz kunduzgidan ko'ra ko'proq elektr signal ishlab chiqarishi mumkin, ayniqsa tush ko'rish bosqichida."
+  },
+  {
+    "id": 16,
+    "category": "fan",
+    "text": "Chaqmoq quyosh yuzasidan besh baravar issiqroq bo'lishi mumkin, garchi u atigi bir necha soniyaning bir ulushi davom etsa ham."
+  },
+  {
+    "id": 17,
+    "category": "tarix",
+    "text": "Kleopatra davridan bizgacha bo'lgan vaqt, piramidalar qurilgan davrdan Kleopatragacha bo'lgan vaqtdan qisqaroq."
+  },
+  {
+    "id": 18,
+    "category": "hayvonot",
+    "text": "Ninachilar ovlagan hasharotlarining to'qson besh foizini muvaffaqiyatli tutadi, bu esa ularni tabiatdagi eng samarali ovchilardan biriga aylantiradi."
+  },
+  {
+    "id": 19,
+    "category": "dunyo",
+    "text": "Yaponiyada shunday orollar borki, ularda odamlardan ko'ra quyonlar ko'proq. Okunoshima oroli 'Quyonlar oroli' deb ham ataladi."
+  },
+  {
+    "id": 20,
+    "category": "kosmos",
+    "text": "Bir kunlik quyosh energiyasi butun insoniyatning bir yillik energiya ehtiyojini qondirish uchun yetarli, faqat uni to'liq yig'ib olish texnologiyasi kerak."
+  }
+]
