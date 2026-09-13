@@ -1,0 +1,175 @@
+{
+  "name": "Instagram -> YouTube auto-repost",
+  "active": false,
+  "nodes": [
+    {
+      "id": "n1-trigger",
+      "name": "Every 15 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [-1200, 0],
+      "parameters": {
+        "rule": {
+          "interval": [
+            { "field": "minutes", "minutesInterval": 15 }
+          ]
+        }
+      }
+    },
+    {
+      "id": "n2-load-accounts",
+      "name": "Load Accounts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-960, 0],
+      "parameters": {
+        "jsCode": "const raw = $env.ACCOUNTS_JSON || '[]';\nlet accounts;\ntry {\n  accounts = JSON.parse(raw);\n} catch (e) {\n  throw new Error('ACCOUNTS_JSON is not valid JSON: ' + e.message);\n}\nif (!Array.isArray(accounts) || accounts.length === 0) {\n  return [];\n}\nreturn accounts.map(acc => ({ json: acc }));"
+      }
+    },
+    {
+      "id": "n3-fetch-ig-media",
+      "name": "Fetch IG Media",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [-720, 0],
+      "parameters": {
+        "url": "=https://graph.facebook.com/v19.0/{{$json.ig_user_id}}/media",
+        "authentication": "none",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "fields", "value": "id,caption,media_type,media_url,permalink,timestamp" },
+            { "name": "access_token", "value": "={{$json.access_token}}" },
+            { "name": "limit", "value": "={{$env.IG_FETCH_LIMIT || 5}}" }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "n4-split-media",
+      "name": "Split Media Items",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [-480, 0],
+      "parameters": {
+        "fieldToSplitOut": "data"
+      }
+    },
+    {
+      "id": "n5-only-videos",
+      "name": "Only Videos",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [-240, 0],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "cond-media-type",
+              "leftValue": "={{$json.media_type}}",
+              "rightValue": "VIDEO",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "n6-skip-posted",
+      "name": "Skip Already Posted",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nstaticData.posted = staticData.posted || [];\nreturn items.filter(item => !staticData.posted.includes(item.json.id));"
+      }
+    },
+    {
+      "id": "n7-download-video",
+      "name": "Download Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [240, 0],
+      "parameters": {
+        "url": "={{$json.media_url}}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "n8-upload-youtube",
+      "name": "Upload to YouTube",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [480, 0],
+      "parameters": {
+        "resource": "video",
+        "operation": "upload",
+        "title": "={{$('Skip Already Posted').item.json.caption ? $('Skip Already Posted').item.json.caption.slice(0, 95) : 'Video'}}",
+        "regionCode": "US",
+        "categoryId": "24",
+        "binaryPropertyName": "data",
+        "options": {
+          "description": "={{($('Skip Already Posted').item.json.caption || '') + '\\n\\nManba: ' + $('Skip Already Posted').item.json.permalink}}",
+          "privacyStatus": "={{$env.YT_PRIVACY_STATUS || 'unlisted'}}"
+        }
+      },
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "YouTube account"
+        }
+      }
+    },
+    {
+      "id": "n9-mark-posted",
+      "name": "Mark As Posted",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 0],
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nstaticData.posted = staticData.posted || [];\nconst output = [];\nfor (let i = 0; i < items.length; i++) {\n  const original = $('Skip Already Posted').itemMatching(i).json;\n  if (!staticData.posted.includes(original.id)) {\n    staticData.posted.push(original.id);\n  }\n  if (staticData.posted.length > 2000) {\n    staticData.posted = staticData.posted.slice(-1000);\n  }\n  output.push({ json: { ...items[i].json, source_media_id: original.id } });\n}\nreturn output;"
+      }
+    }
+  ],
+  "connections": {
+    "Every 15 Minutes": {
+      "main": [[{ "node": "Load Accounts", "type": "main", "index": 0 }]]
+    },
+    "Load Accounts": {
+      "main": [[{ "node": "Fetch IG Media", "type": "main", "index": 0 }]]
+    },
+    "Fetch IG Media": {
+      "main": [[{ "node": "Split Media Items", "type": "main", "index": 0 }]]
+    },
+    "Split Media Items": {
+      "main": [[{ "node": "Only Videos", "type": "main", "index": 0 }]]
+    },
+    "Only Videos": {
+      "main": [
+        [{ "node": "Skip Already Posted", "type": "main", "index": 0 }],
+        []
+      ]
+    },
+    "Skip Already Posted": {
+      "main": [[{ "node": "Download Video", "type": "main", "index": 0 }]]
+    },
+    "Download Video": {
+      "main": [[{ "node": "Upload to YouTube", "type": "main", "index": 0 }]]
+    },
+    "Upload to YouTube": {
+      "main": [[{ "node": "Mark As Posted", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
