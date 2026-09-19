@@ -1,0 +1,19 @@
+{
+  "name": "futbol-tahlil-pwa",
+  "version": "1.0.0",
+  "description": "Futbol o'yinlarini tahlil qilib, g'alaba ehtimoli yuqori jamoani ko'rsatadigan lokal PWA",
+  "main": "server/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

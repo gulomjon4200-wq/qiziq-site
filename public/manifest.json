@@ -1,0 +1,25 @@
+{
+  "name": "Futbol Tahlil",
+  "short_name": "FutbolAI",
+  "description": "Futbol o'yinlarini tahlil qilib, g'alaba ehtimoli yuqori jamoani ko'rsatuvchi lokal ilova",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
