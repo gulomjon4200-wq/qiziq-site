@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Futbol Tahlil</title>
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Futbol Tahlil" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>⚽ Futbol Tahlil</h1>
+    <button id="refreshBtn" class="icon-btn" title="Yangilash" aria-label="Yangilash">⟳</button>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-day="today">Bugun</button>
+    <button class="tab" data-day="tomorrow">Ertaga</button>
+  </nav>
+
+  <main id="content" class="content">
+    <div id="loading" class="state-box">Yuklanmoqda...</div>
+    <div id="errorBox" class="state-box error hidden"></div>
+    <div id="emptyBox" class="state-box hidden">Bu kunga tanlangan ligalarda o'yin topilmadi.</div>
+    <div id="matchList" class="match-list"></div>
+  </main>
+
+  <footer class="footer">
+    <span id="quotaText">Kvota: -</span>
+    <div id="autoRefreshText" class="auto-refresh-text"></div>
+    <div class="disclaimer">Bashoratlar statistik taxmin, natija kafolati emas. Garov uchun asos sifatida ishlatmang.</div>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>
