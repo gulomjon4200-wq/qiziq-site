@@ -1,5 +1,8 @@
 const state = {
+  view: "matches",
   day: "today",
+  league: null,
+  leaguesLoaded: false,
 };
 
 const els = {
@@ -11,6 +14,13 @@ const els = {
   autoRefreshText: document.getElementById("autoRefreshText"),
   refreshBtn: document.getElementById("refreshBtn"),
   tabs: document.querySelectorAll(".tab"),
+  mainTabs: document.querySelectorAll(".main-tab"),
+  matchesView: document.getElementById("matchesView"),
+  standingsView: document.getElementById("standingsView"),
+  leagueTabs: document.getElementById("leagueTabs"),
+  standingsLoading: document.getElementById("standingsLoading"),
+  standingsError: document.getElementById("standingsError"),
+  standingsTableWrap: document.getElementById("standingsTableWrap"),
 };
 
 function showState({ loading = false, error = null, empty = false }) {
@@ -192,9 +202,150 @@ els.tabs.forEach((tab) => {
   tab.addEventListener("click", () => setDay(tab.dataset.day));
 });
 
+// --- "Liga nabzi" (turnir jadvali + jamoalar forma "nabzi") ---
+
+function showStandingsState({ loading = false, error = null }) {
+  els.standingsLoading.classList.toggle("hidden", !loading);
+  els.standingsError.classList.toggle("hidden", !error);
+  if (error) els.standingsError.textContent = error;
+}
+
+function pulseDotsHtml(pulse) {
+  if (!pulse || !pulse.letters || pulse.letters.length === 0) {
+    return '<span class="pulse-form"></span>';
+  }
+  return `<span class="pulse-form">${pulse.letters
+    .map((l) => `<span class="${l}">${l}</span>`)
+    .join("")}</span>`;
+}
+
+function renderStandingsTable(rows) {
+  if (!rows || rows.length === 0) {
+    els.standingsTableWrap.innerHTML = "";
+    showStandingsState({ error: "Bu liga uchun jadval topilmadi." });
+    return;
+  }
+
+  const body = rows
+    .map(
+      (row) => `
+        <tr>
+          <td>${row.rank}</td>
+          <td class="team-cell">
+            <img src="${row.team.logo}" alt="${escapeHtml(row.team.name)}" loading="lazy" />
+            <span>${escapeHtml(row.team.name)}</span>
+          </td>
+          <td>${row.played}</td>
+          <td>${row.win}</td>
+          <td>${row.draw}</td>
+          <td>${row.lose}</td>
+          <td>${row.goalsDiff > 0 ? "+" : ""}${row.goalsDiff}</td>
+          <td class="points">${row.points}</td>
+          <td>
+            <div class="pulse-cell" title="${escapeHtml(row.pulse.label)}">
+              <span>${row.pulse.emoji}</span>
+              ${pulseDotsHtml(row.pulse)}
+            </div>
+          </td>
+        </tr>`
+    )
+    .join("");
+
+  els.standingsTableWrap.innerHTML = `
+    <table class="standings-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th style="text-align:left">Jamoa</th>
+          <th>O</th>
+          <th>G</th>
+          <th>D</th>
+          <th>M</th>
+          <th>Farq</th>
+          <th>Ochko</th>
+          <th>Nabz</th>
+        </tr>
+      </thead>
+      <tbody>${body}</tbody>
+    </table>
+  `;
+}
+
+async function loadStandings(force = false) {
+  if (state.league === null) return;
+  showStandingsState({ loading: true });
+  els.standingsTableWrap.innerHTML = "";
+
+  try {
+    const res = await fetch(`/api/standings?league=${state.league}${force ? "&force=true" : ""}`);
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || "Noma'lum xatolik");
+    }
+
+    renderQuota(data.quota);
+    showStandingsState({});
+    renderStandingsTable(data.standings);
+  } catch (err) {
+    showStandingsState({ error: `Xatolik: ${err.message}` });
+  }
+}
+
+function setLeague(leagueId) {
+  state.league = leagueId;
+  document
+    .querySelectorAll("#leagueTabs .tab")
+    .forEach((tab) => tab.classList.toggle("active", Number(tab.dataset.league) === leagueId));
+  loadStandings(false);
+}
+
+async function loadLeagues() {
+  if (state.leaguesLoaded) return;
+  try {
+    const res = await fetch("/api/leagues");
+    const leagues = await res.json();
+
+    els.leagueTabs.innerHTML = leagues
+      .map(
+        (l, i) =>
+          `<button class="tab${i === 0 ? " active" : ""}" data-league="${l.id}">${escapeHtml(l.name)}</button>`
+      )
+      .join("");
+
+    els.leagueTabs.querySelectorAll(".tab").forEach((tab) => {
+      tab.addEventListener("click", () => setLeague(Number(tab.dataset.league)));
+    });
+
+    state.leaguesLoaded = true;
+    if (leagues.length > 0) {
+      state.league = leagues[0].id;
+      loadStandings(false);
+    }
+  } catch (err) {
+    showStandingsState({ error: `Ligalar ro'yxati yuklanmadi: ${err.message}` });
+  }
+}
+
+function setView(view) {
+  state.view = view;
+  els.mainTabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.view === view));
+  els.matchesView.classList.toggle("hidden", view !== "matches");
+  els.standingsView.classList.toggle("hidden", view !== "standings");
+
+  if (view === "standings") {
+    loadLeagues();
+  }
+}
+
+els.mainTabs.forEach((tab) => {
+  tab.addEventListener("click", () => setView(tab.dataset.view));
+});
+
 els.refreshBtn.addEventListener("click", () => {
   els.refreshBtn.classList.add("spinning");
-  loadMatches(true).finally(() => els.refreshBtn.classList.remove("spinning"));
+  const task = state.view === "standings" ? loadStandings(true) : loadMatches(true);
+  task.finally(() => els.refreshBtn.classList.remove("spinning"));
 });
 
 // Ilk yuklash

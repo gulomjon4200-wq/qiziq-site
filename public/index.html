@@ -18,17 +18,34 @@
     <button id="refreshBtn" class="icon-btn" title="Yangilash" aria-label="Yangilash">⟳</button>
   </header>
 
-  <nav class="tabs">
-    <button class="tab active" data-day="today">Bugun</button>
-    <button class="tab" data-day="tomorrow">Ertaga</button>
+  <nav class="main-tabs">
+    <button class="main-tab active" data-view="matches">⚽ O'yinlar</button>
+    <button class="main-tab" data-view="standings">📊 Liga nabzi</button>
   </nav>
 
-  <main id="content" class="content">
-    <div id="loading" class="state-box">Yuklanmoqda...</div>
-    <div id="errorBox" class="state-box error hidden"></div>
-    <div id="emptyBox" class="state-box hidden">Bu kunga tanlangan ligalarda o'yin topilmadi.</div>
-    <div id="matchList" class="match-list"></div>
-  </main>
+  <section id="matchesView" class="view">
+    <nav class="tabs">
+      <button class="tab active" data-day="today">Bugun</button>
+      <button class="tab" data-day="tomorrow">Ertaga</button>
+    </nav>
+
+    <main id="content" class="content">
+      <div id="loading" class="state-box">Yuklanmoqda...</div>
+      <div id="errorBox" class="state-box error hidden"></div>
+      <div id="emptyBox" class="state-box hidden">Bu kunga tanlangan ligalarda o'yin topilmadi.</div>
+      <div id="matchList" class="match-list"></div>
+    </main>
+  </section>
+
+  <section id="standingsView" class="view hidden">
+    <nav class="tabs" id="leagueTabs"></nav>
+
+    <main class="content">
+      <div id="standingsLoading" class="state-box">Yuklanmoqda...</div>
+      <div id="standingsError" class="state-box error hidden"></div>
+      <div id="standingsTableWrap" class="standings-wrap"></div>
+    </main>
+  </section>
 
   <footer class="footer">
     <span id="quotaText">Kvota: -</span>

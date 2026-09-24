@@ -235,4 +235,60 @@ function evaluateFixture({ fixture, homeForm, awayForm, homeInjuries, awayInjuri
   };
 }
 
-module.exports = { evaluateFixture };
+// "Liga nabzi" jadvali uchun: API-Football standings javobidagi "form" satrini
+// (masalan "LWWDL", eskisidan yangisiga) jamoaning so'nggi formasi "nabzi"ga
+// aylantiradi. computeForm bilan bir xil vaznlash mantig'i ishlatiladi.
+const PULSE_LEVELS = [
+  { min: 0.75, emoji: "🔥", label: "Yuqori nabz" },
+  { min: 0.55, emoji: "📈", label: "Barqaror" },
+  { min: 0.35, emoji: "📉", label: "Pasaymoqda" },
+  { min: 0, emoji: "❄️", label: "Past nabz" },
+];
+
+function pulseFromFormString(formString) {
+  const letters = String(formString || "")
+    .split("")
+    .filter((c) => c === "W" || c === "D" || c === "L");
+
+  if (letters.length === 0) {
+    return { score: 0.5, letters: [], wins: 0, draws: 0, losses: 0, emoji: "➖", label: "Ma'lumot yo'q" };
+  }
+
+  // API-Football "form" satrida eng chapdagi harf eng eski o'yin - shuning
+  // uchun teskari aylantirib, eng so'nggi o'yin birinchi bo'lishini ta'minlaymiz.
+  const mostRecentFirst = [...letters].reverse().slice(0, 5);
+  const weights = [5, 4, 3, 2, 1];
+
+  let weightedSum = 0;
+  let weightTotal = 0;
+  let wins = 0,
+    draws = 0,
+    losses = 0;
+  const uzLetters = [];
+
+  mostRecentFirst.forEach((letter, i) => {
+    const point = letter === "W" ? 1 : letter === "D" ? 0.5 : 0;
+    const w = weights[i] || 1;
+    weightedSum += point * w;
+    weightTotal += w;
+    if (letter === "W") wins++;
+    else if (letter === "D") draws++;
+    else losses++;
+    uzLetters.push(letter === "W" ? "G" : letter === "D" ? "D" : "M");
+  });
+
+  const score = weightTotal ? weightedSum / weightTotal : 0.5;
+  const level = PULSE_LEVELS.find((l) => score >= l.min);
+
+  return {
+    score,
+    letters: uzLetters.reverse(), // eskisidan yangisiga, ko'rsatish uchun
+    wins,
+    draws,
+    losses,
+    emoji: level.emoji,
+    label: level.label,
+  };
+}
+
+module.exports = { evaluateFixture, pulseFromFormString };

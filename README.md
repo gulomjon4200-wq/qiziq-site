@@ -10,6 +10,11 @@ yangilab turadi** — buning uchun ilovani qayta ochish yoki ⟳ tugmasini bosis
 (faqat server/kompyuter shu vaqtda ishlab turgan bo'lishi kerak). Batafsili: pastdagi
 "5.1 Avtomatik kunlik yangilanish" bo'limi.
 
+Ilovada "⚽ O'yinlar" bo'limidan tashqari **"📊 Liga nabzi"** bo'limi ham bor: tanlangan
+liganing to'liq turnir jadvali (o'rin, o'ynagan/g'alaba/durang/mag'lubiyat, gollar farqi,
+ochkolar) va har bir jamoaning so'nggi 5 o'yiniga qarab hisoblangan "nabzi" — 🔥 Yuqori
+nabz / 📈 Barqaror / 📉 Pasaymoqda / ❄️ Past nabz ko'rinishida.
+
 > **Eslatma:** Bashoratlar oddiy statistik taxmin, hech qanday natija kafolati emas.
 > Garov (bet) qarorlari uchun asos sifatida ishlatmang.
 
