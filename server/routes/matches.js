@@ -2,25 +2,9 @@ const express = require("express");
 const apiFootball = require("../apiFootball");
 const cache = require("../cache");
 const scoring = require("../scoring");
+const { LEAGUES, LEAGUE_IDS, LEAGUE_NAME_BY_ID, getSeason } = require("../leagues");
 
 const router = express.Router();
-
-// Tahlil qilinadigan ligalar (faqat shu 4 tasi)
-const LEAGUES = [
-  { id: 39, name: "Angliya Premer-ligasi" },
-  { id: 140, name: "Ispaniya La Liga" },
-  { id: 135, name: "Italiya Seriya A" },
-  { id: 78, name: "Germaniya Bundesligasi" },
-];
-const LEAGUE_IDS = new Set(LEAGUES.map((l) => l.id));
-const LEAGUE_NAME_BY_ID = Object.fromEntries(LEAGUES.map((l) => [l.id, l.name]));
-
-function getSeason() {
-  if (process.env.SEASON) return Number(process.env.SEASON);
-  const now = new Date();
-  const month = now.getMonth() + 1;
-  return month >= 7 ? now.getFullYear() : now.getFullYear() - 1;
-}
 
 function dateStringFor(day, timezone) {
   const now = new Date(new Date().toLocaleString("en-US", { timeZone: timezone }));

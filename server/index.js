@@ -3,7 +3,9 @@ require("dotenv").config();
 const express = require("express");
 const path = require("path");
 const matches = require("./routes/matches");
+const standings = require("./routes/standings");
 const scheduler = require("./scheduler");
+const { LEAGUES } = require("./leagues");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,6 +23,7 @@ app.use(express.static(path.join(__dirname, "..", "public")));
 
 // API marshrutlari
 app.use("/api", matches.router);
+app.use("/api", standings.router);
 
 app.get("/api/health", (req, res) => {
   res.json({ ok: true, hasApiKey: hasApiKey() });
@@ -49,6 +52,9 @@ app.listen(PORT, () => {
     task: async () => {
       await matches.getMatchesForDay("today", true);
       await matches.getMatchesForDay("tomorrow", true);
+      for (const league of LEAGUES) {
+        await standings.getStandingsForLeague(league.id, true);
+      }
     },
   });
   console.log(`Avtomatik kunlik yangilanish yoqildi: har kuni soat ${DAILY_REFRESH_HOUR}:00 (${TIMEZONE}).`);

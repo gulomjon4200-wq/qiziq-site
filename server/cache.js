@@ -72,6 +72,7 @@ const TTL = {
   FORM: 24 * 60 * 60 * 1000, // 24 soat
   INJURIES: 12 * 60 * 60 * 1000, // 12 soat
   H2H: 7 * 24 * 60 * 60 * 1000, // 7 kun
+  STANDINGS: 6 * 60 * 60 * 1000, // 6 soat
 };
 
 module.exports = { get, set, remember, TTL };

@@ -124,10 +124,15 @@ function getHeadToHead(teamAId, teamBId, count = 10) {
   return request("/fixtures/headtohead", { h2h: `${teamAId}-${teamBId}`, last: count });
 }
 
+function getStandings(league, season) {
+  return request("/standings", { league, season });
+}
+
 module.exports = {
   getFixturesByDate,
   getTeamLastFixtures,
   getInjuriesByFixture,
   getHeadToHead,
+  getStandings,
   getStatus,
 };
