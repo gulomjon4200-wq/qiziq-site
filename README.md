@@ -16,9 +16,15 @@ ochkolar) va har bir jamoaning so'nggi 5 o'yiniga qarab hisoblangan "nabzi" — 
 nabz / 📈 Barqaror / 📉 Pasaymoqda / ❄️ Past nabz ko'rinishida.
 
 "Liga nabzi" standart 4 ta klub ligasi (Premer-liga, La Liga, Seriya A, Bundesliga)
-bilan cheklanmaydi — bo'lim ichidagi qidiruv maydonchasi orqali istalgan boshqa
-turnirni (masalan, "Jahon chempionati saralash", milliy terma jamoalar musobaqalari)
-nomi bo'yicha qidirib, uning jadvalini ham ko'rish mumkin.
+bilan cheklanmaydi — dunyodagi **barcha** chempionatlar/turnirlar (klub ligalari,
+kubok musobaqalari, milliy terma jamoalar musobaqalari, jumladan "Jahon
+chempionati saralash" kabilar) ro'yxati bir marta yuklab olinadi va qidiruv
+maydonchasida nomi yoki davlati bo'yicha (masalan "Braziliya", "Jahon
+chempionati") lahzada filtrlanadi.
+
+Bundan tashqari, "Liga nabzi" ma'lumotlari standart holatda **har soatda**
+avtomatik yangilanadi (standart 4 liga + siz oldin ko'rgan boshqa istalgan
+turnir) — batafsili pastdagi "5.1" bo'limida.
 
 > **Eslatma:** Bashoratlar oddiy statistik taxmin, hech qanday natija kafolati emas.
 > Garov (bet) qarorlari uchun asos sifatida ishlatmang.
@@ -125,6 +131,8 @@ diskka (`data/cache.json`) keshlaydi:
 | Jamoa formasi (so'nggi 5 o'yin) | 24 soat |
 | Jarohatlar | 12 soat |
 | O'zaro uchrashuvlar (H2H) | 7 kun |
+| Liga nabzi (turnir jadvali) | 1 soat |
+| Chempionatlar katalogi / qidiruv | 24 soat |
 
 Ekranning tepasidagi ⟳ tugmasi bosilsa, keshni chetlab o'tib ma'lumotlar qayta
 yuklanadi (buni faqat kerak bo'lganda bosing — har safar bosish kvotangizni tezroq
@@ -152,6 +160,26 @@ Muhim jihatlar:
 - Kompyuteringizni doim yoqib qo'yishni istamasangiz, buni kichik bir Raspberry Pi,
   eski noutbuk yoki uy serverida `npm start` (yoki `pm2 start server/index.js`) bilan
   doimiy ishlatib qo'yish mumkin.
+
+### "Liga nabzi"ning soatlik yangilanishi
+
+Standart 4 liga va siz "Liga nabzi" qidiruvi orqali oldin ko'rgan istalgan
+boshqa chempionat/terma jamoalar turniri `.env` faylidagi
+`LEAGUE_REFRESH_INTERVAL_MINUTES` (standart — `60`, ya'ni har soat) da
+avtomatik qayta yuklanadi. Sahifadagi "📊 Liga nabzi" bo'limi pastida oxirgi
+avtomatik yangilanish vaqti ko'rsatiladi.
+
+> **Muhim (API kvotasi haqida):** Dunyoda 1000 dan ortiq chempionat/turnir
+> mavjud — ularning **hammasini** har soat so'rash bepul tarifning kunlik
+> ~100 so'rov limitini zumda tugatib qo'yadi. Shuning uchun avtomatik
+> yangilanish faqat standart 4 liga + siz shaxsan qidirib ko'rgan turnirlar
+> uchun ishlaydi (boshqa hamma narsa — qidiruv orqali "Liga nabzi"da bir marta
+> ochilgach, shundan keyin avtomatik yangilanadigan ro'yxatga qo'shiladi).
+> Hattoki shu holatda ham, standart 4 liganing o'zi har soat yangilansa,
+> kuniga ~96 so'rov sarflanadi — bu deyarli butun bepul kvotani egallaydi.
+> Agar "429" xatolari ko'p chiqsa, `LEAGUE_REFRESH_INTERVAL_MINUTES` qiymatini
+> oshiring (masalan `180` — har 3 soatda, yoki `360` — har 6 soatda), yoki
+> API-Football'ning pullik tarifiga o'ting.
 
 ---
 

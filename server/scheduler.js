@@ -8,6 +8,7 @@ const fs = require("fs");
 const path = require("path");
 
 const STATUS_FILE = path.join(__dirname, "..", "data", "auto-refresh.json");
+const INTERVAL_STATUS_FILE = path.join(__dirname, "..", "data", "interval-refresh.json");
 
 function readLastRun() {
   try {
@@ -95,4 +96,46 @@ function getLastRun() {
   return readLastRun();
 }
 
-module.exports = { start, getLastRun };
+function readLastIntervalRun() {
+  try {
+    return JSON.parse(fs.readFileSync(INTERVAL_STATUS_FILE, "utf8"));
+  } catch {
+    return { lastRunAt: null, lastError: null, label: null };
+  }
+}
+
+function writeLastIntervalRun(info) {
+  try {
+    fs.mkdirSync(path.dirname(INTERVAL_STATUS_FILE), { recursive: true });
+    fs.writeFileSync(INTERVAL_STATUS_FILE, JSON.stringify(info), "utf8");
+  } catch (err) {
+    console.error("[scheduler] holat saqlanmadi:", err.message);
+  }
+}
+
+/**
+ * Muntazam oraliqda (masalan har soat) ishlaydigan sodda rejalashtiruvchi -
+ * server ishga tushganda darhol bir marta, so'ng har `intervalMs`da qayta
+ * bajaradi. Kunlik `start()`dan farqi: aniq mahalliy soatga bog'lanmaydi.
+ */
+function startInterval({ intervalMs, task, label }) {
+  async function runOnce() {
+    try {
+      await task();
+      writeLastIntervalRun({ lastRunAt: new Date().toISOString(), lastError: null, label });
+      console.log(`[scheduler] ${label} bajarildi.`);
+    } catch (err) {
+      writeLastIntervalRun({ lastRunAt: new Date().toISOString(), lastError: err.message, label });
+      console.error(`[scheduler] ${label}da xatolik:`, err.message);
+    }
+  }
+
+  runOnce();
+  setInterval(runOnce, intervalMs);
+}
+
+function getLastIntervalRun() {
+  return readLastIntervalRun();
+}
+
+module.exports = { start, getLastRun, startInterval, getLastIntervalRun };

@@ -4,6 +4,8 @@ const state = {
   league: null,
   season: null,
   leaguesLoaded: false,
+  allLeagues: [],
+  allLeaguesLoaded: false,
 };
 
 const els = {
@@ -25,6 +27,7 @@ const els = {
   leagueSearchForm: document.getElementById("leagueSearchForm"),
   leagueSearchInput: document.getElementById("leagueSearchInput"),
   leagueSearchResults: document.getElementById("leagueSearchResults"),
+  leagueRefreshText: document.getElementById("leagueRefreshText"),
 };
 
 function showState({ loading = false, error = null, empty = false }) {
@@ -165,6 +168,31 @@ async function loadAutoRefreshStatus() {
       : `Oxirgi avtomatik yangilanish: ${text}`;
   } catch {
     els.autoRefreshText.textContent = "";
+  }
+}
+
+async function loadLeagueRefreshStatus() {
+  try {
+    const res = await fetch("/api/auto-refresh/leagues");
+    const data = await res.json();
+
+    if (!data || !data.lastRunAt) {
+      els.leagueRefreshText.textContent = "Liga nabzi avtomatik yangilanishi hali ishlamagan.";
+      return;
+    }
+
+    const text = new Date(data.lastRunAt).toLocaleString("uz-UZ", {
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    els.leagueRefreshText.textContent = data.lastError
+      ? `Liga nabzi oxirgi avtomatik yangilanishi: ${text} (xatolik: ${data.lastError})`
+      : `Liga nabzi oxirgi avtomatik yangilanishi: ${text}`;
+  } catch {
+    els.leagueRefreshText.textContent = "";
   }
 }
 
@@ -346,31 +374,43 @@ function renderLeagueSearchResults(items) {
   els.leagueSearchResults.classList.remove("hidden");
 }
 
-async function searchLeagues(query) {
-  showStandingsState({ loading: true });
+// Dunyodagi barcha chempionatlar ro'yxati bir marta yuklab olinadi, shundan
+// keyin qidiruv mahalliy (lokal) filtrlash orqali bajariladi - har bir harf
+// uchun serverga alohida so'rov yubormaydi (API kvotasini tejaydi va tezroq).
+async function loadAllLeaguesCatalog() {
+  if (state.allLeaguesLoaded) return;
   try {
-    const res = await fetch(`/api/leagues/search?q=${encodeURIComponent(query)}`);
+    const res = await fetch("/api/leagues/all");
     const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || "Noma'lum xatolik");
-    }
-
-    showStandingsState({});
-    renderLeagueSearchResults(data);
+    if (!res.ok) throw new Error(data.error || "Noma'lum xatolik");
+    state.allLeagues = data;
+    state.allLeaguesLoaded = true;
   } catch (err) {
-    showStandingsState({ error: `Qidirishda xatolik: ${err.message}` });
+    console.warn("Chempionatlar katalogi yuklanmadi:", err.message);
   }
 }
 
-els.leagueSearchForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const query = els.leagueSearchInput.value.trim();
-  if (query.length < 3) {
-    showStandingsState({ error: "Qidiruv uchun kamida 3 ta harf kiriting." });
+function filterLeagues(query) {
+  const q = query.trim().toLowerCase();
+  if (!q) return [];
+  return state.allLeagues
+    .filter((l) => l.name.toLowerCase().includes(q) || (l.country || "").toLowerCase().includes(q))
+    .slice(0, 60);
+}
+
+els.leagueSearchInput.addEventListener("input", () => {
+  const query = els.leagueSearchInput.value;
+  if (!query.trim()) {
+    els.leagueSearchResults.classList.add("hidden");
+    els.leagueSearchResults.innerHTML = "";
     return;
   }
-  searchLeagues(query);
+  if (!state.allLeaguesLoaded) return;
+  renderLeagueSearchResults(filterLeagues(query));
+});
+
+els.leagueSearchForm.addEventListener("submit", (e) => {
+  e.preventDefault();
 });
 
 async function loadLeagues() {
@@ -408,6 +448,8 @@ function setView(view) {
 
   if (view === "standings") {
     loadLeagues();
+    loadAllLeaguesCatalog();
+    loadLeagueRefreshStatus();
   }
 }
 

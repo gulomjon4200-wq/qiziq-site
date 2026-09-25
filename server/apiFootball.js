@@ -132,6 +132,12 @@ function searchLeagues(query) {
   return request("/leagues", { search: query });
 }
 
+// Dunyodagi barcha chempionatlar/turnirlar ro'yxati (klub ligalari, kubok
+// musobaqalari, terma jamoalar turnirlari va h.k.) - filtrsiz, bitta so'rov.
+function getAllLeagues() {
+  return request("/leagues", {});
+}
+
 module.exports = {
   getFixturesByDate,
   getTeamLastFixtures,
@@ -139,5 +145,6 @@ module.exports = {
   getHeadToHead,
   getStandings,
   searchLeagues,
+  getAllLeagues,
   getStatus,
 };
