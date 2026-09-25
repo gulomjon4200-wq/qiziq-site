@@ -128,11 +128,16 @@ function getStandings(league, season) {
   return request("/standings", { league, season });
 }
 
+function searchLeagues(query) {
+  return request("/leagues", { search: query });
+}
+
 module.exports = {
   getFixturesByDate,
   getTeamLastFixtures,
   getInjuriesByFixture,
   getHeadToHead,
   getStandings,
+  searchLeagues,
   getStatus,
 };
