@@ -2,6 +2,7 @@ const express = require("express");
 const apiFootball = require("../apiFootball");
 const cache = require("../cache");
 const scoring = require("../scoring");
+const watchedLeagues = require("../watchedLeagues");
 const { LEAGUES, LEAGUE_IDS, getSeason } = require("../leagues");
 
 const router = express.Router();
@@ -14,6 +15,10 @@ const router = express.Router();
 // (ular klub ligalari kabi avgust-iyul mavsum siklida bo'lmasligi mumkin).
 async function getStandingsForLeague(leagueId, force, seasonOverride) {
   const season = seasonOverride || getSeason();
+
+  if (!LEAGUE_IDS.has(leagueId)) {
+    watchedLeagues.remember(leagueId, season);
+  }
 
   const standingsRes = await cache.remember(
     `standings:${leagueId}:${season}`,
@@ -114,4 +119,58 @@ router.get("/leagues/search", async (req, res) => {
   }
 });
 
-module.exports = { router, getStandingsForLeague };
+// Dunyodagi barcha chempionatlar/turnirlar ro'yxati (klub ligalari, kubok
+// musobaqalari, terma jamoalar musobaqalari va h.k.) - frontend buni bir marta
+// yuklab, qidiruvni endi mahalliy (lokal) filtrlash orqali bajaradi, shu
+// tufayli har bir harf uchun alohida so'rov yubormaydi.
+router.get("/leagues/all", async (req, res) => {
+  try {
+    const results = await cache.remember(
+      "leagues-catalog",
+      cache.TTL.LEAGUES_CATALOG,
+      () => apiFootball.getAllLeagues()
+    );
+
+    const items = (results.value || []).map((item) => {
+      const seasons = item.seasons || [];
+      const currentSeason = seasons.find((s) => s.current) || seasons[seasons.length - 1];
+      return {
+        id: item.league.id,
+        name: item.league.name,
+        logo: item.league.logo,
+        type: item.league.type,
+        country: item.country && item.country.name,
+        season: currentSeason ? currentSeason.year : null,
+      };
+    });
+
+    items.sort((a, b) => (a.country || "").localeCompare(b.country || "") || a.name.localeCompare(b.name));
+
+    res.json(items);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Soatlik avtomatik yangilanish uchun: standart 4 ta liga + foydalanuvchi
+// oldin ko'rgan boshqa barcha ligalarni qayta yuklaydi. Dunyodagi 1000+
+// turnirning HAMMASINI har soat so'rash API kvotasini zumda tugatib qo'yadi -
+// shuning uchun faqat haqiqatda ko'rilgan (yoki standart) ligalar yangilanadi.
+async function refreshWatchedLeagues(force) {
+  const seen = new Set();
+
+  for (const league of LEAGUES) {
+    const season = getSeason();
+    seen.add(`${league.id}:${season}`);
+    await getStandingsForLeague(league.id, force);
+  }
+
+  for (const w of watchedLeagues.getAll()) {
+    const key = `${w.leagueId}:${w.season}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    await getStandingsForLeague(w.leagueId, force, w.season);
+  }
+}
+
+module.exports = { router, getStandingsForLeague, refreshWatchedLeagues };

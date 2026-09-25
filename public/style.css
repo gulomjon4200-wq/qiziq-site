@@ -448,6 +448,12 @@ body {
   opacity: 0.8;
 }
 
+.league-refresh-text {
+  text-align: center;
+  padding: 0 18px 14px;
+  color: var(--text-dim);
+}
+
 .disclaimer {
   margin-top: 6px;
   font-size: 11px;
