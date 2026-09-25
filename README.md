@@ -15,6 +15,11 @@ liganing to'liq turnir jadvali (o'rin, o'ynagan/g'alaba/durang/mag'lubiyat, goll
 ochkolar) va har bir jamoaning so'nggi 5 o'yiniga qarab hisoblangan "nabzi" — 🔥 Yuqori
 nabz / 📈 Barqaror / 📉 Pasaymoqda / ❄️ Past nabz ko'rinishida.
 
+"Liga nabzi" standart 4 ta klub ligasi (Premer-liga, La Liga, Seriya A, Bundesliga)
+bilan cheklanmaydi — bo'lim ichidagi qidiruv maydonchasi orqali istalgan boshqa
+turnirni (masalan, "Jahon chempionati saralash", milliy terma jamoalar musobaqalari)
+nomi bo'yicha qidirib, uning jadvalini ham ko'rish mumkin.
+
 > **Eslatma:** Bashoratlar oddiy statistik taxmin, hech qanday natija kafolati emas.
 > Garov (bet) qarorlari uchun asos sifatida ishlatmang.
 

@@ -40,6 +40,17 @@
   <section id="standingsView" class="view hidden">
     <nav class="tabs" id="leagueTabs"></nav>
 
+    <form id="leagueSearchForm" class="league-search">
+      <input
+        id="leagueSearchInput"
+        type="text"
+        placeholder="Boshqa turnir qidirish (masalan: Jahon chempionati saralash)"
+        autocomplete="off"
+      />
+      <button type="submit" class="icon-btn" aria-label="Qidirish">🔍</button>
+    </form>
+    <div id="leagueSearchResults" class="league-search-results hidden"></div>
+
     <main class="content">
       <div id="standingsLoading" class="state-box">Yuklanmoqda...</div>
       <div id="standingsError" class="state-box error hidden"></div>

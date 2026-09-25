@@ -2,6 +2,7 @@ const state = {
   view: "matches",
   day: "today",
   league: null,
+  season: null,
   leaguesLoaded: false,
 };
 
@@ -21,6 +22,9 @@ const els = {
   standingsLoading: document.getElementById("standingsLoading"),
   standingsError: document.getElementById("standingsError"),
   standingsTableWrap: document.getElementById("standingsTableWrap"),
+  leagueSearchForm: document.getElementById("leagueSearchForm"),
+  leagueSearchInput: document.getElementById("leagueSearchInput"),
+  leagueSearchResults: document.getElementById("leagueSearchResults"),
 };
 
 function showState({ loading = false, error = null, empty = false }) {
@@ -276,8 +280,12 @@ async function loadStandings(force = false) {
   showStandingsState({ loading: true });
   els.standingsTableWrap.innerHTML = "";
 
+  const params = new URLSearchParams({ league: state.league });
+  if (state.season) params.set("season", state.season);
+  if (force) params.set("force", "true");
+
   try {
-    const res = await fetch(`/api/standings?league=${state.league}${force ? "&force=true" : ""}`);
+    const res = await fetch(`/api/standings?${params.toString()}`);
     const data = await res.json();
 
     if (!res.ok) {
@@ -292,13 +300,78 @@ async function loadStandings(force = false) {
   }
 }
 
-function setLeague(leagueId) {
+// leagueId/season null bo'lsa - bu doimiy 4 ligadan biri (mavsum serverda
+// avtomatik hisoblanadi). season berilgan bo'lsa - qidiruv orqali topilgan
+// boshqa turnir.
+function setLeague(leagueId, season = null) {
   state.league = leagueId;
+  state.season = season;
   document
     .querySelectorAll("#leagueTabs .tab")
-    .forEach((tab) => tab.classList.toggle("active", Number(tab.dataset.league) === leagueId));
+    .forEach((tab) => tab.classList.toggle("active", !season && Number(tab.dataset.league) === leagueId));
+  els.leagueSearchResults.classList.add("hidden");
+  els.leagueSearchResults.innerHTML = "";
   loadStandings(false);
 }
+
+// --- Qidiruv orqali boshqa turnir/liga tanlash ---
+
+function renderLeagueSearchResults(items) {
+  if (!items || items.length === 0) {
+    els.leagueSearchResults.innerHTML = '<div class="state-box">Hech narsa topilmadi.</div>';
+    els.leagueSearchResults.classList.remove("hidden");
+    return;
+  }
+
+  els.leagueSearchResults.innerHTML = items
+    .map(
+      (item, i) => `
+        <button type="button" class="league-result" data-index="${i}">
+          <img src="${item.logo || ""}" alt="" loading="lazy" />
+          <span>
+            <div class="league-result-name">${escapeHtml(item.name)}</div>
+            <div class="league-result-meta">${escapeHtml(item.country || "")}${
+              item.season ? " · " + item.season + " mavsumi" : ""
+            }</div>
+          </span>
+        </button>`
+    )
+    .join("");
+
+  els.leagueSearchResults.querySelectorAll(".league-result").forEach((btn) => {
+    const item = items[Number(btn.dataset.index)];
+    btn.addEventListener("click", () => setLeague(item.id, item.season));
+  });
+
+  els.leagueSearchResults.classList.remove("hidden");
+}
+
+async function searchLeagues(query) {
+  showStandingsState({ loading: true });
+  try {
+    const res = await fetch(`/api/leagues/search?q=${encodeURIComponent(query)}`);
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || "Noma'lum xatolik");
+    }
+
+    showStandingsState({});
+    renderLeagueSearchResults(data);
+  } catch (err) {
+    showStandingsState({ error: `Qidirishda xatolik: ${err.message}` });
+  }
+}
+
+els.leagueSearchForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const query = els.leagueSearchInput.value.trim();
+  if (query.length < 3) {
+    showStandingsState({ error: "Qidiruv uchun kamida 3 ta harf kiriting." });
+    return;
+  }
+  searchLeagues(query);
+});
 
 async function loadLeagues() {
   if (state.leaguesLoaded) return;
